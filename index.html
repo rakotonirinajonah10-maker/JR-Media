@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08090d">
+  <meta name="description" content="JR Media — catalogue multimédia moderne.">
+  <title>JR Media</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="JR Media">JR<span>Media</span></a>
+    <button class="icon-btn" id="searchToggle" aria-label="Rechercher">⌕</button>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">JR MEDIA • V1</p>
+        <h1>Ton univers<br><span>cinéma & séries.</span></h1>
+        <p class="hero-text">Découvre des contenus, sauvegarde tes favoris et retrouve rapidement ce que tu veux regarder.</p>
+        <button class="primary" data-action="explore">Explorer maintenant</button>
+      </div>
+    </section>
+
+    <section class="search-panel hidden" id="searchPanel">
+      <input id="searchInput" type="search" placeholder="Rechercher un film, une série..." autocomplete="off">
+    </section>
+
+    <section class="section" id="featured">
+      <div class="section-head"><h2>À découvrir</h2><button class="text-btn" data-filter="all">Voir tout</button></div>
+      <div class="cards" id="featuredCards"></div>
+    </section>
+
+    <section class="section" id="films">
+      <div class="section-head"><h2>🎬 Films</h2><button class="text-btn" data-filter="film">Voir tout</button></div>
+      <div class="cards" id="filmCards"></div>
+    </section>
+
+    <section class="section" id="series">
+      <div class="section-head"><h2>📺 Séries</h2><button class="text-btn" data-filter="serie">Voir tout</button></div>
+      <div class="cards" id="seriesCards"></div>
+    </section>
+
+    <section class="section" id="cartoons">
+      <div class="section-head"><h2>🧸 Dessins animés</h2><button class="text-btn" data-filter="cartoon">Voir tout</button></div>
+      <div class="cards" id="cartoonCards"></div>
+    </section>
+
+    <section class="section results hidden" id="resultsSection">
+      <div class="section-head"><h2>Résultats</h2></div>
+      <div class="cards" id="resultsCards"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navigation principale">
+    <a class="nav-item active" href="#home"><span>⌂</span>Accueil</a>
+    <a class="nav-item" href="#films"><span>🎬</span>Films</a>
+    <a class="nav-item" href="#series"><span>📺</span>Séries</a>
+    <a class="nav-item" href="#cartoons"><span>🧸</span>Animés</a>
+    <button class="nav-item" id="favoritesBtn"><span>♡</span>Favoris</button>
+  </nav>
+
+  <div class="modal hidden" id="detailModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="close" id="closeModal">×</button>
+      <div class="detail-poster" id="detailPoster"></div>
+      <div class="detail-body">
+        <span class="badge" id="detailType"></span>
+        <h2 id="detailTitle"></h2>
+        <p class="meta" id="detailMeta"></p>
+        <p id="detailDescription"></p>
+        <div class="detail-actions">
+          <button class="primary" id="watchBtn">▶ Regarder</button>
+          <button class="secondary" id="downloadBtn">📥 Télécharger</button>
+        </div>
+        <p class="legal-note">Les fonctions de téléchargement seront activées uniquement pour les contenus dont la distribution ou le téléchargement est autorisé.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
