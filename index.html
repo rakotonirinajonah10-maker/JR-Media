@@ -11,13 +11,16 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#home" aria-label="JR Media">JR<span>Media</span></a>
-    <button class="icon-btn" id="searchToggle" aria-label="Rechercher">⌕</button>
+    <div class="top-actions">
+      <button class="icon-btn" id="searchToggle" aria-label="Rechercher">⌕</button>
+      <button class="account-btn" id="accountBtn">Connexion</button>
+    </div>
   </header>
 
   <main>
     <section id="home" class="hero">
       <div class="hero-content">
-        <p class="eyebrow">JR MEDIA • V1</p>
+        <p class="eyebrow">JR MEDIA • V2</p>
         <h1>Ton univers<br><span>cinéma & séries.</span></h1>
         <p class="hero-text">Découvre des contenus, sauvegarde tes favoris et retrouve rapidement ce que tu veux regarder.</p>
         <button class="primary" data-action="explore">Explorer maintenant</button>
@@ -76,6 +79,28 @@
           <button class="secondary" id="downloadBtn">📥 Télécharger</button>
         </div>
         <p class="legal-note">Les fonctions de téléchargement seront activées uniquement pour les contenus dont la distribution ou le téléchargement est autorisé.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="authModal" role="dialog" aria-modal="true">
+    <div class="auth-card">
+      <button class="close" id="closeAuth">×</button>
+      <div id="authLoggedOut">
+        <p class="eyebrow">JR MEDIA • COMPTE</p>
+        <h2 id="authTitle">Connexion</h2>
+        <p class="auth-subtitle">Crée ton compte ou connecte-toi pour retrouver tes favoris.</p>
+        <input id="authEmail" class="auth-input" type="email" placeholder="Adresse e-mail" autocomplete="email">
+        <input id="authPassword" class="auth-input" type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <button class="primary auth-submit" id="authSubmit">Se connecter</button>
+        <button class="text-btn auth-switch" id="authSwitch">Créer un compte</button>
+        <p class="auth-message" id="authMessage"></p>
+      </div>
+      <div id="authLoggedIn" class="hidden">
+        <p class="eyebrow">JR MEDIA • COMPTE</p>
+        <h2>Compte connecté</h2>
+        <p class="auth-subtitle" id="accountEmail"></p>
+        <button class="secondary auth-submit" id="signOutBtn">Se déconnecter</button>
       </div>
     </div>
   </div>
