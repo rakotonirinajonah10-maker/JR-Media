@@ -12,6 +12,8 @@ const fallbackMedia=[
 let media=[...fallbackMedia];
 let favorites=JSON.parse(localStorage.getItem('jrMediaFavorites')||'[]');
 let current=null;
+let authMode='login';
+let supabaseClient=null;
 const $=s=>document.querySelector(s);
 
 function posterStyle(id){const gradients=['linear-gradient(145deg,#283c5b,#11131a)','linear-gradient(145deg,#5a344d,#11131a)','linear-gradient(145deg,#315947,#11131a)','linear-gradient(145deg,#6a5430,#11131a)','linear-gradient(145deg,#43356c,#11131a)','linear-gradient(145deg,#245e67,#11131a)'];return gradients[(Number(id)-1)%gradients.length]||gradients[0]}
@@ -26,26 +28,56 @@ function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show'
 
 async function loadMediaFromSupabase(){
   try{
-    if(!window.supabase||!window.SUPABASE_URL||!window.SUPABASE_PUBLISHABLE_KEY) return;
-    const client=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_PUBLISHABLE_KEY);
-    const {data,error}=await client.from('media').select('*').order('created_at',{ascending:false});
-    if(error) throw error;
-    if(Array.isArray(data)&&data.length){
-      media=data.map(x=>({...x,desc:x.description||''}));
-      renderAll();
-      toast(`${media.length} contenus chargés`);
-    }
-  }catch(error){console.error('JR Media / Supabase:',error);}
+    if(!window.supabase||!window.SUPABASE_URL||!window.SUPABASE_PUBLISHABLE_KEY)return;
+    supabaseClient=supabaseClient||window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_PUBLISHABLE_KEY);
+    const {data,error}=await supabaseClient.from('media').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    if(Array.isArray(data)&&data.length){media=data.map(x=>({...x,desc:x.description||''}));renderAll();toast(`${media.length} contenus chargés`)}
+  }catch(error){console.error('JR Media / Supabase:',error)}
 }
 
+function setAuthMessage(message,isError=true){const el=$('#authMessage');el.textContent=message;el.className=`auth-message ${isError?'error':'success'}`}
+function openAuth(){updateAuthUI();$('#authModal').classList.remove('hidden')}
+function closeAuth(){$('#authModal').classList.add('hidden')}
+function updateAuthUI(){const loggedIn=!!window.currentJRUser;$('#authLoggedOut').classList.toggle('hidden',loggedIn);$('#authLoggedIn').classList.toggle('hidden',!loggedIn);$('#accountBtn').textContent=loggedIn?'Mon compte':'Connexion';if(loggedIn)$('#accountEmail').textContent=window.currentJRUser.email||'Compte JR Media'}
+async function initAuth(){
+  if(!window.supabase||!window.SUPABASE_URL||!window.SUPABASE_PUBLISHABLE_KEY)return;
+  supabaseClient=supabaseClient||window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_PUBLISHABLE_KEY);
+  const {data}=await supabaseClient.auth.getSession();
+  window.currentJRUser=data?.session?.user||null;
+  updateAuthUI();
+  supabaseClient.auth.onAuthStateChange((_event,session)=>{window.currentJRUser=session?.user||null;updateAuthUI()});
+}
+async function submitAuth(){
+  if(!supabaseClient){setAuthMessage('Connexion Supabase indisponible.');return}
+  const email=$('#authEmail').value.trim();const password=$('#authPassword').value;
+  if(!email||!password){setAuthMessage('Entre ton e-mail et ton mot de passe.');return}
+  $('#authSubmit').disabled=true;setAuthMessage('Connexion en cours...',false);
+  try{
+    if(authMode==='signup'){
+      const {data,error}=await supabaseClient.auth.signUp({email,password});if(error)throw error;
+      if(data.session){window.currentJRUser=data.user;setAuthMessage('Compte créé et connecté.',false);updateAuthUI();toast('Bienvenue sur JR Media')}
+      else setAuthMessage('Compte créé. Vérifie ton e-mail pour confirmer le compte.',false);
+    }else{
+      const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;
+      window.currentJRUser=data.user;updateAuthUI();setAuthMessage('Connexion réussie.',false);toast('Connexion réussie');
+    }
+  }catch(error){setAuthMessage(error.message||'Une erreur est survenue.')}
+  finally{$('#authSubmit').disabled=false}
+}
+function switchAuthMode(){authMode=authMode==='login'?'signup':'login';$('#authTitle').textContent=authMode==='login'?'Connexion':'Créer un compte';$('#authSubmit').textContent=authMode==='login'?'Se connecter':'Créer mon compte';$('#authSwitch').textContent=authMode==='login'?'Créer un compte':'J’ai déjà un compte';$('#authPassword').autocomplete=authMode==='login'?'current-password':'new-password';setAuthMessage('')}
+async function signOut(){if(!supabaseClient)return;await supabaseClient.auth.signOut();window.currentJRUser=null;updateAuthUI();closeAuth();toast('Déconnexion réussie')}
+
 $('#closeModal').addEventListener('click',closeDetail);$('#detailModal').addEventListener('click',e=>{if(e.target.id==='detailModal')closeDetail()});
-$('#watchBtn').addEventListener('click',()=>{if(current?.video_url){window.open(current.video_url,'_blank','noopener')}else toast('Lecteur vidéo à connecter pour ce contenu.')});
-$('#downloadBtn').addEventListener('click',()=>{if(current?.download_url){window.open(current.download_url,'_blank','noopener')}else toast('Téléchargement disponible uniquement pour les contenus autorisés.')});
+$('#watchBtn').addEventListener('click',()=>{if(current?.video_url)window.open(current.video_url,'_blank','noopener');else toast('Lecteur vidéo à connecter pour ce contenu.')});
+$('#downloadBtn').addEventListener('click',()=>{if(current?.download_url)window.open(current.download_url,'_blank','noopener');else toast('Téléchargement disponible uniquement pour les contenus autorisés.')});
 $('#searchToggle').addEventListener('click',()=>{$('#searchPanel').classList.toggle('hidden');if(!$('#searchPanel').classList.contains('hidden'))$('#searchInput').focus()});
 $('#searchInput').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();const section=$('#resultsSection');if(!q){section.classList.add('hidden');return}const results=media.filter(x=>(x.title+' '+(x.genre||'')+' '+(typeLabel[x.type]||x.type)).toLowerCase().includes(q));section.classList.remove('hidden');render(results,'#resultsCards')});
 $('[data-action="explore"]').addEventListener('click',()=>$('#featured').scrollIntoView({behavior:'smooth'}));
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.filter;if(f==='all'){$('#featured').scrollIntoView({behavior:'smooth'});return}document.getElementById(f==='film'?'films':f==='serie'?'series':'cartoons').scrollIntoView({behavior:'smooth'})}));
 $('#favoritesBtn').addEventListener('click',()=>{const results=media.filter(x=>favorites.includes(Number(x.id)));$('#resultsSection').classList.remove('hidden');render(results,'#resultsCards');$('#resultsSection').scrollIntoView({behavior:'smooth'});if(!results.length)toast('Aucun favori pour le moment.')});
+$('#accountBtn').addEventListener('click',openAuth);$('#closeAuth').addEventListener('click',closeAuth);$('#authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});$('#authSubmit').addEventListener('click',submitAuth);$('#authSwitch').addEventListener('click',switchAuthMode);$('#signOutBtn').addEventListener('click',signOut);
 
 renderAll();
 loadMediaFromSupabase();
+initAuth();
