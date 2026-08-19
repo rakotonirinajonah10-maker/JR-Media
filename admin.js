@@ -1,3 +1,4 @@
+const ADMIN_EMAIL='rakotonirinajonah10@gmail.com';
 let client=null, items=[], editingId=null;
 const $=s=>document.querySelector(s);
 function msg(t,ok=false){$('#message').textContent=t;$('#message').style.color=ok?'#9ee6b0':'#ff9b9b'}
@@ -8,6 +9,11 @@ async function start(){
   client=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_PUBLISHABLE_KEY);
   const {data:{session}}=await client.auth.getSession();
   if(!session){location.href='index.html';return}
+  const email=(session.user.email||'').toLowerCase();
+  if(email!==ADMIN_EMAIL.toLowerCase()){
+   $('#loading').innerHTML='<h2>Accès refusé</h2><p>Ce compte n’a pas les droits administrateur.</p><p><a href="index.html">Retour à JR Media</a></p>';
+   return;
+  }
   $('#adminEmail').textContent=session.user.email||'';
   $('#loading').classList.add('hidden');$('#app').classList.remove('hidden');
   await load();
