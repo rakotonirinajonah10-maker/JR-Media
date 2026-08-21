@@ -1,28 +1,14 @@
 <!doctype html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#08090d"><title>JR Media — Admin</title>
-<link rel="stylesheet" href="admin.css">
-</head><body>
-<div id="loading" class="screen">Vérification du compte…</div>
-<div id="app" class="hidden">
-<header class="admin-top"><div><strong>JR <span>Media</span></strong><small>ADMIN</small></div><button id="logout">Déconnexion</button></header>
-<main class="wrap">
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#08090d"><title>JR Media — Admin</title><link rel="stylesheet" href="admin.css"></head><body>
+<div id="loading" class="screen">Vérification du compte…</div><div id="app" class="hidden"><header class="admin-top"><div><strong>JR <span>Media</span></strong><small>ADMIN</small></div><button id="logout">Déconnexion</button></header><main class="wrap">
 <section class="welcome"><p>TABLEAU DE BORD</p><h1>Gestion du catalogue</h1><span id="adminEmail"></span></section>
 <section class="stats"><div><b id="total">0</b><span>Contenus</span></div><div><b id="films">0</b><span>Films</span></div><div><b id="series">0</b><span>Séries</span></div><div><b id="cartoons">0</b><span>Animés</span></div></section>
 <section class="panel"><div class="panel-head"><h2 id="formTitle">Ajouter un contenu</h2><button class="ghost hidden" id="cancelEdit">Annuler</button></div>
-<form id="mediaForm">
-<input type="hidden" id="mediaId">
-<label>Titre<input id="title" required placeholder="Ex. Mon film"></label>
+<form id="mediaForm"><input type="hidden" id="mediaId"><label>Titre<input id="title" required placeholder="Ex. Mon film"></label>
 <div class="grid"><label>Type<select id="type"><option value="film">Film</option><option value="serie">Série</option><option value="cartoon">Dessin animé</option></select></label><label>Année<input id="year" type="number" min="1900" max="2100"></label></div>
-<label>Genre<input id="genre" placeholder="Action, aventure…"></label>
-<label>Description<textarea id="description" rows="4" placeholder="Description du contenu"></textarea></label>
-<label>URL de l'affiche<input id="posterUrl" type="url" placeholder="https://..."></label>
-<div class="grid"><label>URL vidéo<input id="videoUrl" type="url" placeholder="https://..."></label><label>URL téléchargement autorisé<input id="downloadUrl" type="url" placeholder="https://..."></label></div>
-<label class="check"><input id="featured" type="checkbox"> Afficher dans « À découvrir »</label>
-<button class="primary" id="saveBtn" type="submit">Ajouter le contenu</button><p id="message"></p>
-</form></section>
-<section class="panel"><div class="panel-head"><h2>Catalogue</h2><input id="filter" class="small-input" placeholder="Rechercher…"></div><div id="list"></div></section>
-</main></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js"></script>
-</body></html>
+<label>Genre<input id="genre" placeholder="Action, aventure…"></label><label>Description<textarea id="description" rows="4" placeholder="Description du contenu"></textarea></label>
+<label>Affiche du contenu<input id="posterFile" type="file" accept="image/jpeg,image/png,image/webp"><small id="uploadStatus" style="display:block;margin-top:6px;color:#858c99">JPG, PNG ou WebP</small></label>
+<input id="posterUrl" type="hidden"><div class="grid"><label>URL vidéo<input id="videoUrl" type="url" placeholder="https://..."></label><label>URL téléchargement autorisé<input id="downloadUrl" type="url" placeholder="https://..."></label></div>
+<label class="check"><input id="featured" type="checkbox"> Afficher dans « À découvrir »</label><button class="primary" id="saveBtn" type="submit">Ajouter le contenu</button><p id="message"></p></form></section>
+<section class="panel"><div class="panel-head"><h2>Catalogue</h2><input id="filter" class="small-input" placeholder="Rechercher…"></div><div id="list"></div></section></main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="admin.js"></script></body></html>
